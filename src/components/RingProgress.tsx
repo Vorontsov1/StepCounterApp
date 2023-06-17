@@ -2,20 +2,19 @@ import React, { useEffect } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import Svg, { Circle, Rect } from "react-native-svg";
 import Animated, {
-    useAnimatedProps,
+  useAnimatedProps,
   useSharedValue,
   withTiming,
   useAnimatedStyle,
   Easing,
 } from "react-native-reanimated";
 
-
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 type RingProgressProps = {
   radius?: number;
-    strokeWidth?: number;
-    progress: number;
+  strokeWidth?: number;
+  progress: number;
 };
 
 const color = "#ee0f55";
@@ -26,31 +25,30 @@ const RingProgress = ({
   progress,
 }: RingProgressProps) => {
   const innerRadius = radius - strokeWidth / 2;
-    const circumference = innerRadius * 2 * Math.PI;
+  const circumference = innerRadius * 2 * Math.PI;
 
-    const fill = useSharedValue(0.5);
+  const fill = useSharedValue(0.5);
 
-    useEffect(() => { 
-        fill.value = withTiming(progress, {duration: 2000});
-    },[progress])
+  useEffect(() => {
+    fill.value = withTiming(progress, { duration: 2000 });
+  }, [progress]);
 
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDasharray: [circumference * fill.value, circumference],
+  }));
 
-    const animatedProps = useAnimatedProps(() => ({ 
-        strokeDasharray: [circumference * fill.value, circumference],
-    }))
-    
-    const circleDefaultProps: CircleProps = {
-          r: innerRadius,
-          cx: radius,
-          cy: radius,
-          originX: radius,
-          originY: radius,
-          strokeWidth: strokeWidth,
-          stroke: color,
-          strokeLinecap: "round",
-    }
+  const circleDefaultProps: CircleProps = {
+    r: innerRadius,
+    cx: radius,
+    cy: radius,
+    originX: radius,
+    originY: radius,
+    strokeWidth: strokeWidth,
+    stroke: color,
+    strokeLinecap: "round",
+    rotation: "-90",
+  };
 
-    
   return (
     <View
       style={{
@@ -60,18 +58,13 @@ const RingProgress = ({
       }}
     >
       <Svg>
-              {/* background */ }
-              
-              <Circle { ...circleDefaultProps } opacity={ 0.2 } />
-              
+        {/* background */}
 
-              {/* foreground */ }
-              
-        <AnimatedCircle
-          animatedProps={animatedProps}
-          {...circleDefaultProps}
-          rotation="-90"
-        />
+        <Circle {...circleDefaultProps} opacity={0.2} />
+
+        {/* foreground */}
+
+        <AnimatedCircle animatedProps={animatedProps} {...circleDefaultProps} />
       </Svg>
     </View>
   );
