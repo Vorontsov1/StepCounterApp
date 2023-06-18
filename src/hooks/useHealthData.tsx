@@ -4,6 +4,8 @@ import AppleHealthKit, {
   HealthInputOptions,
 } from "react-native-health";
 import { useEffect, useState } from "react";
+import { TimeRangeFilter } from "react-native-health-connect/lib/typescript/types/base.types";
+
 
 
 
@@ -38,12 +40,17 @@ const useHealthData = (date: Date) => {
   useEffect(() => {
     if (!hasPermissions) return;
 
+    const timeRangeFilter: TimeRangeFilter = {
+      operator: "between",
+      startTime: new Date(date.setHours(0, 0, 0, 0)).toISOString(),
+      endTime: new Date(date.setHours(23, 59, 59, 999)).toISOString(),
+    };
+
     const options: HealthInputOptions = {
       date: date.toISOString(),
       includeManuallyAdded: false,
+      timeRangeFilter: timeRangeFilter,
     };
-
-
 
     AppleHealthKit.getStepCount(options, (error, results) => {
       if (error) {
@@ -68,7 +75,7 @@ const useHealthData = (date: Date) => {
       }
       setDistance(results.value);
     });
-  }, [hasPermissions]);
+  }, [hasPermissions, date]); // added date here so it will re-run when date changes
 
   return {
     steps,
